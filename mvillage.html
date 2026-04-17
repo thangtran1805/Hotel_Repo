@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Express By M Village Hoàng Việt | M Village</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Be Vietnam Pro', sans-serif; background: #f7f7f5; color: #1a1a1a; font-size: 15px; }
+
+  /* HEADER */
+  header {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: #1a1a1a; letter-spacing: -1px; }
+  .logo span { color: #e05c1a; }
+  nav { display: flex; align-items: center; gap: 32px; }
+  nav a { text-decoration: none; color: #1a1a1a; font-size: 14px; font-weight: 400; white-space: nowrap; }
+  nav a:hover { color: #e05c1a; }
+  .nav-badge { background: #e05c1a; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-left: 4px; }
+  .nav-flag { font-size: 13px; color: #555; display: flex; align-items: center; gap: 4px; }
+  .btn-login {
+    background: #e05c1a; color: #fff; border: none; padding: 10px 20px;
+    border-radius: 24px; font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif; white-space: nowrap;
+  }
+  .btn-login:hover { background: #c94e12; }
+  .hamburger { font-size: 20px; cursor: pointer; color: #555; }
+
+  /* BREADCRUMB */
+  .breadcrumb {
+    padding: 14px 40px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    color: #777;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .breadcrumb a { color: #777; text-decoration: underline; }
+  .breadcrumb span { color: #999; }
+  .breadcrumb .current { color: #1a1a1a; font-weight: 500; }
+
+  /* PHOTO GRID */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.62fr 0.62fr;
+    grid-template-rows: 145px 145px;
+    gap: 4px;
+    margin: 0;
+    height: 294px;
+  }
+  .photo-grid .main-photo {
+    grid-row: 1 / 3;
+    background: #ccc;
+    overflow: hidden;
+  }
+  .photo-grid img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.4s ease;
+  }
+  .photo-grid img:hover { transform: scale(1.03); }
+  .photo-counter {
+    position: relative;
+  }
+  .counter-badge {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(0,0,0,0.6); color: #fff;
+    font-size: 12px; padding: 4px 10px; border-radius: 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* TABS */
+  .tabs-bar {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    padding: 0 40px;
+    display: flex; gap: 0;
+  }
+  .tab-btn {
+    padding: 16px 24px;
+    font-size: 14px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: none; border: none; cursor: pointer;
+    color: #777; font-weight: 400;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { color: #1a1a1a; font-weight: 600; border-bottom-color: #e05c1a; }
+  .tab-btn:hover:not(.active) { color: #333; }
+
+  /* MAIN CONTENT */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 40px 40px; }
+
+  /* INTRO SECTION */
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+  .hotel-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 500; line-height: 1.2; margin-bottom: 16px; }
+  .hotel-desc { font-size: 14px; color: #555; line-height: 1.8; margin-bottom: 28px; }
+  .amenities-title { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+  .amenities-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px 8px;
+  }
+  .amenity-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; color: #444; line-height: 1.4;
+  }
+  .amenity-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* MAP CARD */
+  .map-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #eee;
+  }
+  .map-placeholder {
+    height: 180px;
+    background: linear-gradient(135deg, #e8f0e8 0%, #d4e4d4 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .map-placeholder::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(0,0,0,0.04) 30px, rgba(0,0,0,0.04) 31px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.04) 40px, rgba(0,0,0,0.04) 41px);
+  }
+  .map-pin {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px; height: 24px;
+    background: #e05c1a; border-radius: 50% 50% 50% 0;
+    transform: translate(-50%, -60%) rotate(-45deg);
+  }
+  .map-pin::after {
+    content: '';
+    position: absolute; top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    background: #fff; border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .map-info { padding: 14px 16px; }
+  .map-address { font-size: 12px; color: #666; margin-bottom: 12px; }
+  .nearby-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .nearby-item {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: #555;
+    padding: 4px 0;
+  }
+  .nearby-item .km { color: #999; }
+  .map-link { color: #e05c1a; font-size: 13px; text-decoration: none; display: block; margin-top: 10px; }
+  .map-link:hover { text-decoration: underline; }
+
+  /* SECTION DIVIDER */
+  .section-divider { border: none; border-top: 1px solid #eee; margin: 0 0 36px; }
+
+  /* ROOM FILTER BAR */
+  .room-filter-bar {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 28px;
+    background: #fff;
+  }
+  .filter-group { flex: 1; }
+  .filter-group + .filter-group { border-left: 1px solid #eee; padding-left: 24px; margin-left: 24px; }
+  .filter-label { font-size: 11px; color: #e05c1a; font-weight: 600; margin-bottom: 2px; }
+  .filter-value { font-size: 14px; color: #1a1a1a; font-weight: 500; }
+  .btn-apply {
+    background: #fff; color: #e05c1a;
+    border: 1.5px solid #e05c1a;
+    padding: 10px 24px; border-radius: 24px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    white-space: nowrap;
+  }
+  .btn-apply:hover { background: #fff5f0; }
+
+  /* ROOM CARDS */
+  .room-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 20px;
+    align-items: start;
+  }
+  .room-img-wrap {
+    border-radius: 8px; overflow: hidden;
+    height: 140px; background: #ddd;
+    position: relative;
+  }
+  .room-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .room-dots {
+    position: absolute; bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 4px;
+  }
+  .room-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+  }
+  .room-dots span.active { background: #fff; }
+  .room-name { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+  .room-specs {
+    display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .room-spec { font-size: 13px; color: #555; display: flex; align-items: center; gap: 5px; }
+  .room-spec-icon { font-size: 14px; }
+  .room-desc { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+  .room-features {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
+  }
+  .room-feature { font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px; }
+  .room-feature-icon { font-size: 13px; }
+  .room-detail-link { color: #e05c1a; font-size: 13px; text-decoration: none; display: block; margin-top: 12px; }
+  .room-detail-link:hover { text-decoration: underline; }
+  .room-price-col { text-align: right; min-width: 160px; }
+  .room-price { font-size: 22px; font-weight: 700; color: #e05c1a; line-height: 1; }
+  .room-price-unit { font-size: 13px; color: #888; margin-top: 2px; }
+  .room-price-note { font-size: 12px; color: #999; margin-top: 2px; margin-bottom: 8px; }
+  .room-avail { font-size: 12px; color: #e05c1a; font-weight: 500; margin-bottom: 8px; }
+  .room-avail.last { color: #e05c1a; }
+  .avail-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #e05c1a; margin-right: 4px; }
+  .btn-choose {
+    background: #e05c1a; color: #fff;
+    border: none; padding: 12px 24px;
+    border-radius: 24px; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: 'Be Vietnam Pro', sans-serif;
+    width: 100%;
+  }
+  .btn-choose:hover { background: #c94e12; }
+
+  /* LOCATION SECTION */
+  .location-section {
+    display: grid; grid-template-columns: 1fr 1.6fr;
+    gap: 48px; margin: 48px 0;
+    padding: 40px 0; border-top: 1px solid #eee;
+  }
+  .location-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 500; margin-bottom: 14px; }
+  .location-desc { font-size: 14px; color: #555; line-height: 1.8; margin-bottom: 14px; }
+  .location-link { color: #e05c1a; font-size: 13px; text-decoration: none; }
+  .location-link:hover { text-decoration: underline; }
+  .nearby-places-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 15px; font-weight: 600; margin-bottom: 16px;
+  }
+  .nearby-places-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .nearby-place-item {
+    display: flex; justify-content: space-between;
+    padding: 7px 0; font-size: 13px; color: #444;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .nearby-place-item .dist { color: #999; }
+
+  /* OTHER BRANCHES */
+  .other-branches { padding: 40px 0; border-top: 1px solid #eee; }
+  .other-branches h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 500; text-align: center; margin-bottom: 28px; }
+  .branch-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 720px; margin: 0 auto; }
+  .branch-card {
+    background: #fff; border-radius: 12px; overflow: hidden;
+    border: 1px solid #eee;
+  }
+  .branch-img {
+    height: 160px; background: linear-gradient(135deg, #2a2a2a, #555);
+    position: relative; overflow: hidden;
+  }
+  .branch-img img { width: 100%; height: 100%; object-fit: cover; }
+  .branch-logo {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(0,0,0,0.5); color: #fff;
+    font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: 600;
+  }
+  .branch-info { padding: 16px; }
+  .branch-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .branch-address { font-size: 12px; color: #888; margin-bottom: 10px; line-height: 1.5; }
+  .branch-price-row { display: flex; align-items: center; justify-content: space-between; }
+  .branch-price-label { font-size: 11px; color: #999; }
+  .branch-price-val { font-size: 16px; font-weight: 700; color: #e05c1a; }
+  .branch-price-unit { font-size: 11px; color: #999; }
+  .branch-price-note { font-size: 11px; color: #bbb; margin-top: 2px; }
+  .btn-branch {
+    background: #e05c1a; color: #fff; border: none;
+    padding: 8px 18px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+  .btn-branch:hover { background: #c94e12; }
+
+  /* FOOTER */
+  footer { background: #1a1a1a; color: #ccc; }
+  .footer-top {
+    padding: 40px;
+    display: grid; grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 40px;
+    border-bottom: 1px solid #333;
+  }
+  .footer-feedback-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 10px; line-height: 1.4; }
+  .footer-feedback-desc { font-size: 13px; color: #999; line-height: 1.7; margin-bottom: 16px; }
+  .btn-feedback {
+    background: transparent; color: #e05c1a;
+    border: 1.5px solid #e05c1a;
+    padding: 9px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+  .footer-contact-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; }
+  .footer-contact-icon { font-size: 18px; margin-top: 2px; }
+  .footer-contact-label { font-size: 12px; color: #777; }
+  .footer-contact-val { font-size: 15px; color: #fff; font-weight: 500; }
+  .footer-social-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 14px; }
+  .social-icons { display: flex; gap: 12px; }
+  .social-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid #444; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; transition: border-color 0.2s;
+  }
+  .social-icon:hover { border-color: #e05c1a; }
+
+  .footer-bottom {
+    padding: 32px 40px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 24px; border-bottom: 1px solid #333;
+  }
+  .footer-col-title { font-size: 12px; font-weight: 700; color: #e05c1a; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .footer-col a {
+    display: block; color: #999; font-size: 13px;
+    text-decoration: none; margin-bottom: 8px; line-height: 1.5;
+  }
+  .footer-col a:hover { color: #fff; }
+  .footer-app-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 8px; font-family: 'Playfair Display', serif; }
+  .app-badges { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .app-badge {
+    background: #2a2a2a; border: 1px solid #444;
+    border-radius: 6px; padding: 6px 12px;
+    font-size: 11px; color: #ccc; cursor: pointer;
+  }
+  .contact-label { font-size: 12px; color: #e05c1a; font-weight: 600; margin-top: 16px; margin-bottom: 6px; }
+  .contact-text { font-size: 12px; color: #888; line-height: 1.6; }
+
+  .footer-legal {
+    padding: 16px 40px;
+    font-size: 11px; color: #666;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  /* CHAT BUTTON */
+  .chat-btn {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 50px; height: 50px; border-radius: 50%;
+    background: #e05c1a; color: #fff;
+    border: none; font-size: 22px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(224,92,26,0.4);
+    z-index: 200;
+  }
+
+  /* TAB CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SECTION TITLE */
+  .section-title { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 500; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">M<span>|</span></div>
+  <nav>
+    <a href="#">Đặt Phòng</a>
+    <a href="#">Doanh Nghiệp</a>
+    <a href="#">Hội Viên Thân Thiết</a>
+    <a href="#">Thương Hiệu Thành Viên <span class="nav-badge">MỚI</span></a>
+    <span class="nav-flag">🇻🇳 VIE</span>
+    <button class="btn-login">Đăng nhập/Đăng ký</button>
+    <span class="hamburger">☰</span>
+  </nav>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="#">Trang Chủ</a>
+  <span>›</span>
+  <a href="#">Tìm Phòng</a>
+  <span>›</span>
+  <span class="current">Chi Nhánh Express By M Village Hoàng Việt</span>
+</div>
+
+<!-- PHOTO GRID -->
+<div class="photo-grid">
+  <div class="main-photo">
+    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80" alt="Hotel exterior" />
+  </div>
+  <div><img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80" alt="Lobby" /></div>
+  <div><img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&q=80" alt="Room" /></div>
+  <div><img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=80" alt="Kitchen" /></div>
+  <div class="photo-counter">
+    <img src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=500&q=80" alt="Bedroom" />
+    <div class="counter-badge">🖼 15+</div>
+  </div>
+</div>
+
+<!-- TABS BAR -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('intro', this)">Giới thiệu</button>
+  <button class="tab-btn" onclick="switchTab('rooms', this)">Chọn phòng</button>
+  <button class="tab-btn" onclick="switchTab('location', this)">Vị trí</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+  <!-- TAB: GIỚI THIỆU -->
+  <div id="tab-intro" class="tab-content active">
+    <div class="intro-grid">
+      <!-- LEFT -->
+      <div>
+        <h1 class="hotel-title">Express by M Village<br>Hoàng Việt</h1>
+        <p class="hotel-desc">Express by M Village Hoàng Việt tọa lạc ngay gần nhà ga T3 và kết nối nhanh đến các trung tâm hội nghị, bệnh viện lớn trong khu vực và trung tâm thành phố. Đây là lựa chọn lưu trú hiện đại dành cho những chuyến transit, công tác hay sự kiện ngắn ngày. Không gian sáng thoáng với cửa sổ lớn, thiết kế tinh gọn và tiện ích linh hoạt như khu co-working, bếp và giặt sấy giúp bạn luôn chủ động trong mọi lịch trình.</p>
+        <div class="amenities-title">Tiện nghi</div>
+        <div class="amenities-grid">
+          <div class="amenity-item"><span class="amenity-icon">📍</span><span>Gần sân bay (Ga T3)</span></div>
+          <div class="amenity-item"><span class="amenity-icon">💼</span><span>Khu vực làm việc chung</span></div>
+          <div class="amenity-item"><span class="amenity-icon">🫧</span><span>Phòng giặt tự phục vụ</span></div>
+          <div class="amenity-item"><span class="amenity-icon">🍳</span><span>Bếp chung</span></div>
+          <div class="amenity-item"><span class="amenity-icon">📶</span><span>Free Wifi tốc độ cao</span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: MAP -->
+      <div class="map-card">
+        <div class="map-placeholder">
+          <div class="map-pin"></div>
+        </div>
+        <div class="map-info">
+          <p class="map-address">19/1 Hoàng Việt, Phường Tân Sơn Nhất, Thành Phố...</p>
+          <div class="nearby-title">Khám phá khu vực</div>
+          <div class="nearby-item"><span>Maycaighe space</span><span class="km">1.4 km</span></div>
+          <div class="nearby-item"><span>Dumm.cafe</span><span class="km">1.8 km</span></div>
+          <div class="nearby-item"><span>Brux – Belgian Capital Beer</span><span class="km">2.6 km</span></div>
+          <a href="#" class="map-link">Xem thêm tại House Guide</a>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Lựa chọn phòng</h2>
+    <!-- Room Filter -->
+    <div class="room-filter-bar">
+      <div class="filter-group">
+        <div class="filter-label">Nhận phòng</div>
+        <div class="filter-value">T6 17 Tho4 2026</div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Trả phòng</div>
+        <div class="filter-value">T7 18 Tho4 2026</div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Khách</div>
+        <div class="filter-value">2 Khách</div>
+      </div>
+      <button class="btn-apply">Áp dụng</button>
+    </div>
+
+    <!-- Room Cards -->
+    <div class="room-card">
+      <div class="room-img-wrap">
+        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80" alt="Phòng Deluxe" />
+        <div class="room-dots">
+          <span class="active"></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div>
+        <div class="room-name">Phòng Deluxe</div>
+        <div class="room-specs">
+          <span class="room-spec"><span class="room-spec-icon">⊞</span> 27 m²</span>
+          <span class="room-spec"><span class="room-spec-icon">🛏</span> Giường King</span>
+          <span class="room-spec"><span class="room-spec-icon">👥</span> 2 người</span>
+        </div>
+        <p class="room-desc">Phòng Deluxe mang đến không gian nghỉ ngơi sáng thoáng với cửa sổ lớn đón ánh sáng tự nhiên. Thiết kế tối giản hiện đại cùng giường êm ái và bàn làm việc tiện lợi giúp bạn d...</p>
+        <div class="room-features">
+          <span class="room-feature"><span class="room-feature-icon">🪟</span> Cửa sổ</span>
+          <span class="room-feature"><span class="room-feature-icon">🥐</span> Ghế bành</span>
+          <span class="room-feature"><span class="room-feature-icon">💻</span> Bàn làm việc</span>
+          <span class="room-feature"><span class="room-feature-icon">🚿</span> Phòng tắm đứng</span>
+        </div>
+        <a href="#" class="room-detail-link">Xem chi tiết phòng</a>
+      </div>
+      <div class="room-price-col">
+        <div class="room-price">1.050.000</div>
+        <div class="room-price-unit">Đồng / Đêm</div>
+        <div class="room-price-note">Đã bao gồm thuế phí</div>
+        <div class="room-avail">Chỉ còn 2 phòng</div>
+        <button class="btn-choose">Chọn phòng</button>
+      </div>
+    </div>
+
+    <div class="room-card">
+      <div class="room-img-wrap">
+        <img src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=400&q=80" alt="Phòng Deluxe Street View" />
+        <div class="room-dots">
+          <span class="active"></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div>
+        <div class="room-name">Phòng Deluxe Street View</div>
+        <div class="room-specs">
+          <span class="room-spec"><span class="room-spec-icon">⊞</span> 27 m²</span>
+          <span class="room-spec"><span class="room-spec-icon">🛏</span> Giường King</span>
+          <span class="room-spec"><span class="room-spec-icon">👥</span> 2 người</span>
+        </div>
+        <p class="room-desc">Sở hữu tầm nhìn hướng phố, Deluxe Street View là lựa chọn dành cho những ai yêu thích ánh sáng tự nhiên và ngắm nhìn sự chuyển động bên ngoài. Không gian được sắp đặt ti...</p>
+        <div class="room-features">
+          <span class="room-feature"><span class="room-feature-icon">🪟</span> Cửa sổ</span>
+          <span class="room-feature"><span class="room-feature-icon">💻</span> Bàn làm việc</span>
+          <span class="room-feature"><span class="room-feature-icon">🏙</span> View đường phố</span>
+          <span class="room-feature"><span class="room-feature-icon">🚿</span> Phòng tắm đứng</span>
+        </div>
+        <a href="#" class="room-detail-link">Xem chi tiết phòng</a>
+      </div>
+      <div class="room-price-col">
+        <div class="room-price">1.100.000</div>
+        <div class="room-price-unit">Đồng / Đêm</div>
+        <div class="room-price-note">Đã bao gồm thuế phí</div>
+        <div class="room-avail last"><span class="avail-dot"></span>PHÒNG CUỐI</div>
+        <button class="btn-choose">Chọn phòng</button>
+      </div>
+    </div>
+
+    <div class="room-card">
+      <div class="room-img-wrap">
+        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&q=80" alt="Phòng Deluxe City View" />
+        <div class="room-dots">
+          <span class="active"></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div>
+        <div class="room-name">Phòng Deluxe City View Room</div>
+        <div class="room-specs">
+          <span class="room-spec"><span class="room-spec-icon">⊞</span> 27 m²</span>
+          <span class="room-spec"><span class="room-spec-icon">🛏</span> Giường King</span>
+          <span class="room-spec"><span class="room-spec-icon">👥</span> 2 người</span>
+        </div>
+        <p class="room-desc">Deluxe City View sở hữu tầm nhìn thành phố thoáng đãng qua cửa sổ lớn ngập tràn ánh sáng. Thiết kế tối giản, nội thất tinh tế và bàn làm việc tiện lợi giúp bạn vừa thư giãn, vừ...</p>
+        <div class="room-features">
+          <span class="room-feature"><span class="room-feature-icon">🪟</span> Cửa sổ</span>
+          <span class="room-feature"><span class="room-feature-icon">💻</span> Bàn làm việc</span>
+          <span class="room-feature"><span class="room-feature-icon">🏙</span> View thành phố</span>
+          <span class="room-feature"><span class="room-feature-icon">🚿</span> Phòng tắm đứng</span>
+        </div>
+        <a href="#" class="room-detail-link">Xem chi tiết phòng</a>
+      </div>
+      <div class="room-price-col">
+        <div class="room-price">1.150.000</div>
+        <div class="room-price-unit">Đồng / Đêm</div>
+        <div class="room-price-note">Đã bao gồm thuế phí</div>
+        <div class="room-avail">Chỉ còn 3 phòng</div>
+        <button class="btn-choose">Chọn phòng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: VỊ TRÍ -->
+  <div id="tab-location" class="tab-content">
+    <div class="location-section">
+      <div>
+        <h2 class="location-title">Express By M Village Hoàng Việt có gì vui quanh đây?</h2>
+        <p class="location-desc">Tọa lạc tại Tân Bình, chỉ 11 phút đến nhà ga T3, Express by M Village Hoàng Việt mang đến trải nghiệm lưu trú hiện đại và thư thái cho mọi hành trình.</p>
+        <a href="#" class="location-link">Xem thêm tại House Guide</a>
+      </div>
+      <div>
+        <div class="nearby-places-title">📍 Địa điểm xung quanh</div>
+        <div class="nearby-places-grid">
+          <div>
+            <div class="nearby-place-item"><span>Maycaighe space</span><span class="dist">1.4 km</span></div>
+            <div class="nearby-place-item"><span>Brux – Belgian Capital Beer</span><span class="dist">2.6 km</span></div>
+            <div class="nearby-place-item"><span>Thai House Restaurant</span><span class="dist">2.6 km</span></div>
+            <div class="nearby-place-item"><span>Tokyo Soy Ramen</span><span class="dist">2.7 km</span></div>
+            <div class="nearby-place-item"><span>Đậu Homemade</span><span class="dist">3 km</span></div>
+            <div class="nearby-place-item"><span>Marcel Hai Bà Trưng</span><span class="dist">5.3 km</span></div>
+          </div>
+          <div>
+            <div class="nearby-place-item"><span>Dumm.cafe</span><span class="dist">1.8 km</span></div>
+            <div class="nearby-place-item"><span>Chang Kang Kung</span><span class="dist">2.6 km</span></div>
+            <div class="nearby-place-item"><span>D'Maris</span><span class="dist">2.7 km</span></div>
+            <div class="nearby-place-item"><span>Cơm Niêu Thiên Lý</span><span class="dist">3 km</span></div>
+            <div class="nearby-place-item"><span>Tổ Kiến Coffee</span><span class="dist">3 km</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTHER BRANCHES -->
+  <div class="other-branches">
+    <h2>Các chi nhánh khác của M Village</h2>
+    <div class="branch-cards">
+      <div class="branch-card">
+        <div class="branch-img">
+          <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&q=80" alt="M Village Living Cửu Long" />
+          <div class="branch-logo">M | LIVING</div>
+        </div>
+        <div class="branch-info">
+          <div class="branch-name">M Village Living Cửu Long</div>
+          <div class="branch-address">44A Cửu Long, P.2, Q. Tân Bình, HCM</div>
+          <div class="branch-price-row">
+            <div>
+              <div class="branch-price-label">CHỈ TỪ</div>
+              <div><span class="branch-price-val">750.000</span> <span class="branch-price-unit">Đồng / Đêm</span></div>
+              <div class="branch-price-note">Đã bao gồm thuế phí</div>
+            </div>
+            <button class="btn-branch">Chọn phòng</button>
+          </div>
+        </div>
+      </div>
+      <div class="branch-card">
+        <div class="branch-img">
+          <img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500&q=80" alt="Express By M Village Nguyễn Thế Lộc" />
+          <div class="branch-logo">express</div>
+        </div>
+        <div class="branch-info">
+          <div class="branch-name">Express By M Village Nguyễn Thế Lộc</div>
+          <div class="branch-address">10 – 12 Nguyễn Thế Lộc, Phường Bảy Hiền, Thành Phố Hồ Chí Minh, Việt Nam</div>
+          <div class="branch-price-row">
+            <div>
+              <div class="branch-price-label">CHỈ TỪ</div>
+              <div><span class="branch-price-val">1.200.000</span> <span class="branch-price-unit">Đồng / Đêm</span></div>
+              <div class="branch-price-note">Đã bao gồm thuế phí</div>
+            </div>
+            <button class="btn-branch">Chọn phòng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main-content -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-feedback-title">Trải nghiệm của bạn tại M VILLAGE rất quan trọng với chúng tôi</div>
+      <p class="footer-feedback-desc">Chia sẻ suy nghĩ của bạn để chúng tôi có thể tạo ra trải nghiệm tốt hơn cho bạn lần sau</p>
+      <button class="btn-feedback">Chia sẻ suy nghĩ của bạn</button>
+    </div>
+    <div>
+      <div class="footer-contact-item">
+        <span class="footer-contact-icon">📞</span>
+        <div>
+          <div class="footer-contact-label">Hotline</div>
+          <div class="footer-contact-val">1900 3311 / Zalo OA</div>
+        </div>
+      </div>
+      <div class="footer-contact-item">
+        <span class="footer-contact-icon">✉️</span>
+        <div>
+          <div class="footer-contact-label">Email</div>
+          <div class="footer-contact-val">booking@mvillage.vn</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-social-title">Theo dõi chúng tôi qua</div>
+      <div class="social-icons">
+        <div class="social-icon">f</div>
+        <div class="social-icon">📸</div>
+        <div class="social-icon">♪</div>
+        <div class="social-icon">in</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-col">
+      <div class="footer-col-title">M VILLAGE MORE</div>
+      <a href="#">Độc quyền hội viên</a>
+      <a href="#">Chính sách & Điều khoản MORE</a>
+      <div class="footer-col-title" style="margin-top:16px">M VILLAGE</div>
+      <a href="#">Về chúng tôi</a>
+      <a href="#">Chủ đầu tư khách sạn</a>
+      <a href="#">Tuyển dụng</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">ĐẶT PHÒNG</div>
+      <a href="#">Dành cho Khách hàng Cá nhân</a>
+      <a href="#">Lưu trú dài hạn</a>
+      <a href="#">Dành cho Doanh nghiệp</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">CHÍNH SÁCH</div>
+      <a href="#">Chính sách bảo mật</a>
+      <a href="#">Chính sách giao và nhận phòng</a>
+      <a href="#">Chính sách đổi, trả phòng và hoàn tiền</a>
+      <a href="#">Câu hỏi thường gặp</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-app-title">M|</div>
+      <p style="font-size:12px;color:#888;margin-bottom:8px">Tải Ứng dụng M Village – Khám phá ưu đãi ngay!</p>
+      <div class="app-badges">
+        <div class="app-badge">App Store</div>
+        <div class="app-badge">Google Play</div>
+      </div>
+      <div class="contact-label">LIÊN HỆ</div>
+      <div class="contact-text">Giấy phép Dịch vụ Lưu Trú số 256/GCN, ngày cấp 05-07-2023, nơi cấp Công An Thành Phố Hồ Chí Minh</div>
+    </div>
+  </div>
+
+  <div class="footer-legal">
+    <span>© CÔNG TY CỔ PHẦN MVILLAGE &nbsp; Mã số doanh nghiệp: 0316527995. Giấy chứng nhận đăng ký doanh nghiệp do Sở Kế hoạch và Đầu tư TP Hồ Chí Minh cấp ngày 12/10/2020.</span>
+  </div>
+</footer>
+
+<!-- CHAT BUTTON -->
+<button class="chat-btn">💬</button>
+
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
